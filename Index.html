@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>ERP Ambiental Completo</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+body{margin:0;font-family:Arial;background:#0f172a;color:white;display:flex}
+.sidebar{width:250px;background:#111827;height:100vh;padding:10px;position:fixed}
+.content{margin-left:250px;padding:20px;width:100%}
+button{padding:8px;margin:5px;background:#22c55e;border:none;color:black;cursor:pointer}
+.card{background:#1f2937;padding:10px;margin:10px 0}
+.hidden{display:none}
+input,textarea,select{width:100%;margin:5px 0;padding:6px}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" style="position:fixed;width:100%;height:100%;background:#0f172a;display:flex;justify-content:center;align-items:center">
+  <div class="card">
+    <h2>🔐 Login</h2>
+    <input id="user" placeholder="usuario">
+    <input id="pass" type="password" placeholder="contraseña">
+    <button onclick="login()">Entrar</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h3>🌱 ERP Ambiental</h3>
+
+<button onclick="show('dashboard')">Dashboard</button>
+<button onclick="show('clientes')">Clientes</button>
+<button onclick="show('expedientes')">Expedientes</button>
+<button onclick="show('eia')">EIA</button>
+<button onclick="show('rima')">RIMA</button>
+<button onclick="show('pga')">PGA</button>
+<button onclick="show('auditoria')">Auditoría</button>
+<button onclick="show('gis')">GIS</button>
+<button onclick="show('normativa')">Normativa</button>
+<button onclick="show('ia')">IA</button>
+
+</div>
+
+<!-- CONTENIDO -->
+<div class="content">
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="module">
+<h2>📊 Dashboard</h2>
+<div class="card">Sistema activo</div>
+</div>
+
+<!-- CLIENTES -->
+<div id="clientes" class="module hidden">
+<h2>👥 Clientes</h2>
+<input id="cNombre" placeholder="Nombre">
+<input id="cRuc" placeholder="RUC">
+<button onclick="addCliente()">Guardar</button>
+<div id="listaClientes"></div>
+</div>
+
+<!-- EXPEDIENTES -->
+<div id="expedientes" class="module hidden">
+<h2>📁 Expedientes</h2>
+<input id="eNombre" placeholder="Nombre">
+<button onclick="addExp()">Crear</button>
+<div id="listaExp"></div>
+</div>
+
+<!-- EIA -->
+<div id="eia" class="module hidden">
+<h2>🌍 EIA PRO</h2>
+<textarea id="eiaDesc"></textarea>
+<button onclick="genEIA()">Generar</button>
+<div id="outEIA"></div>
+</div>
+
+<!-- RIMA -->
+<div id="rima" class="module hidden">
+<h2>📄 RIMA</h2>
+<button onclick="genRIMA()">Generar</button>
+<div id="outRIMA"></div>
+</div>
+
+<!-- PGA -->
+<div id="pga" class="module hidden">
+<h2>♻️ PGA</h2>
+<button onclick="genPGA()">Generar</button>
+<div id="outPGA"></div>
+</div>
+
+<!-- AUDITORIA -->
+<div id="auditoria" class="module hidden">
+<h2>🧪 Auditoría</h2>
+<button onclick="genAud()">Generar</button>
+<div id="outAud"></div>
+</div>
+
+<!-- GIS -->
+<div id="gis" class="module hidden">
+<h2>🗺️ GIS</h2>
+<div id="map" style="height:300px"></div>
+</div>
+
+<!-- NORMATIVA -->
+<div id="normativa" class="module hidden">
+<h2>⚖️ Normativa</h2>
+<p>Base legal ambiental</p>
+</div>
+
+<!-- IA -->
+<div id="ia" class="module hidden">
+<h2>🧠 IA Ambiental</h2>
+<textarea id="iaInput"></textarea>
+<button onclick="genIA()">Generar</button>
+<div id="outIA"></div>
+</div>
+
+</div>
+
+<script>
+/* ================= LOGIN ================= */
+function login(){
+document.getElementById("loginScreen").style.display="none";
+}
+
+/* ================= NAV ================= */
+function show(id){
+document.querySelectorAll('.module').forEach(m=>m.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+}
+
+/* ================= CLIENTES ================= */
+let clientes=[];
+function addCliente(){
+clientes.push({
+nombre:cNombre.value,
+ruc:cRuc.value
+});
+listaClientes.innerHTML=JSON.stringify(clientes);
+}
+
+/* ================= EXPEDIENTES ================= */
+let exp=[];
+function addExp(){
+exp.push({nombre:eNombre.value});
+listaExp.innerHTML=JSON.stringify(exp);
+}
+
+/* ================= EIA ================= */
+function genEIA(){
+outEIA.innerHTML=`
+Impacto: Medio<br>
+Medidas: Mitigación estándar
+`;
+}
+
+/* ================= RIMA ================= */
+function genRIMA(){
+outRIMA.innerHTML="RIMA generado automáticamente";
+}
+
+/* ================= PGA ================= */
+function genPGA(){
+outPGA.innerHTML="PGA generado automáticamente";
+}
+
+/* ================= AUDITORIA ================= */
+function genAud(){
+outAud.innerHTML="Auditoría básica generada";
+}
+
+/* ================= IA ================= */
+function genIA(){
+outIA.innerHTML="Análisis IA: "+iaInput.value;
+}
+
+/* ================= GIS ================= */
+let map = L.map('map').setView([-25.3,-57.6],10);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+</script>
+
+</body>
+</html>
